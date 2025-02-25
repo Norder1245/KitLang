@@ -1,0 +1,15 @@
+{
+    "name": "KitLang Project",
+    "version": "1.0.0",
+    "description": "A sample project for KitLang",
+    "main": "index.kittenML",
+    "scripts": {
+        "start": "kittenML run index.kittenML",
+        "test": "kittenML test"
+    },
+    "author": "Elijah",
+    "license": "MIT",
+    "dependencies": {
+        "kittenML": "^1.0.0"
+    }
+}
