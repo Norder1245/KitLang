@@ -2,7 +2,7 @@
     "name": "KitLang Project",
     "version": "1.0.0",
     "description": "A sample project for KitLang",
-    "main": "imain.kittenML",
+    "main": "main.kittenML",
     "scripts": {
         "start": "kitlang run main.kittenML",
         "test": "kitlang test"
