@@ -2,10 +2,10 @@
     "name": "KitLang Project",
     "version": "1.0.0",
     "description": "A sample project for KitLang",
-    "main": "index.kittenML",
+    "main": "imain.kittenML",
     "scripts": {
-        "start": "kittenML run index.kittenML",
-        "test": "kittenML test"
+        "start": "kitlang run main.kittenML",
+        "test": "kitlang test"
     },
     "author": "Elijah",
     "license": "MIT",
