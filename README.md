@@ -6,3 +6,5 @@ You know what it is...
 if u dont, than why are you on GitHub???
   
 </details>
+
+[Go to Docs](docs.md)
