@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KitLang Interpreter</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+
+        .container {
+            width: 80%;
+            max-width: 800px;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        textarea {
+            width: 100%;
+            height: 200px;
+            padding: 10px;
+            font-family: monospace;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+
+        button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        #output {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #333;
+            color: white;
+            font-family: monospace;
+            white-space: pre-wrap;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .export-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+
+        .export-container select {
+            padding: 5px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>KitLang Interpreter</h1>
+        <textarea id="codeInput" placeholder="Write your KitLang code here..."></textarea>
+        <button onclick="runCode()">Run Code</button>
+        
+        <!-- Export Section -->
+        <div class="export-container">
+            <select id="fileType">
+                <option value="kl">.kl</option>
+                <option value="ckl">.ckl</option>
+            </select>
+            <button onclick="exportCode()">Export Code</button>
+        </div>
+
+        <div id="output"></div>
+    </div>
+
+    <script>
+        // Simple tokenizer (lexer)
+        function tokenize(code) {
+            const tokens = [];
+            let currentToken = "";
+
+            for (let char of code) {
+                if (char === ' ' || char === '\n' || char === '{' || char === '}' || char === '(' || char === ')'
+                    || char === '=' || char === ';' || char === '"' || char === '>' || char === '<') {
+                    if (currentToken.length > 0) {
+                        tokens.push(currentToken);
+                        currentToken = "";
+                    }
+                    if (char !== ' ' && char !== '\n') {
+                        tokens.push(char); // Push the symbol like `{`, `=`, `;`
+                    }
+                } else {
+                    currentToken += char;
+                }
+            }
+
+            if (currentToken.length > 0) {
+                tokens.push(currentToken);
+            }
+
+            return tokens;
+        }
+
+        // Interpreter with more features
+        function interpret(tokens) {
+            let output = "";
+            let variables = {};
+            let functions = {};
+            let i = 0;
+
+            while (i < tokens.length) {
+                const token = tokens[i];
+
+                if (token === "int" || token === "string" || token === "bool") {
+                    // Handle variable declaration
+                    const varType = token;
+                    const varName = tokens[i + 1];
+                    const equals = tokens[i + 2];
+                    const value = tokens[i + 3];
+
+                    if (equals === "=") {
+                        if (varType === "int") {
+                            variables[varName] = parseInt(value);
+                        } else if (varType === "string") {
+                            variables[varName] = value.replace(/"/g, ''); // Remove quotes from string
+                        } else if (varType === "bool") {
+                            variables[varName] = value === "true";
+                        }
+                        output += `KitLang: Declared ${varType} variable '${varName}' with value ${variables[varName]}\n`;
+                        i += 4;
+                    } else {
+                        i++;
+                    }
+                } else if (token === "print") {
+                    // Handle print function
+                    const varName = tokens[i + 1];
+                    if (variables[varName] !== undefined) {
+                        output += `KitLang: ${varName} = ${variables[varName]}\n`;
+                    } else {
+                        output += `KitLang Error: Variable '${varName}' is not defined\n`;
+                    }
+                    i += 2;
+                } else if (token === "if") {
+                    // Handle if condition
+                    const condition = tokens[i + 1];
+                    const statement = tokens[i + 2];
+
+                    if (condition === "true") {
+                        output += `KitLang: if condition true, statement: ${statement}\n`;
+                    }
+                    i += 3;
+                } else if (token === "kittenfireball") {
+                    // Special function: kittenfireball
+                    const target = tokens[i + 1];
+                    output += `KittenFireball: Launching fireball at ${target} 🐾🔥\n`;
+                    i += 2;
+                } else if (token === "function") {
+                    // Handle function declaration
+                    const functionName = tokens[i + 1];
+                    const param = tokens[i + 2];
+                    const openBrace = tokens[i + 3];
+                    const body = tokens[i + 4];
+                    const closeBrace = tokens[i + 5];
+
+                    functions[functionName] = {
+                        param: param,
+                        body: body
+                    };
+                    output += `KitLang: Function '${functionName}' declared with parameter '${param}'\n`;
+                    i += 6;
+                } else if (token === "call") {
+                    // Call a function
+                    const functionName = tokens[i + 1];
+                    const paramValue = tokens[i + 2];
+
+                    if (functions[functionName]) {
+                        const func = functions[functionName];
+                        output += `KitLang: Calling function '${functionName}' with parameter ${paramValue}\n`;
+                        output += `KitLang: Inside function body: ${func.body.replace("param", paramValue)}\n`;
+                    } else {
+                        output += `KitLang Error: Function '${functionName}' not defined\n`;
+                    }
+                    i += 3;
+                } else {
+                    i++;
+                }
+            }
+
+            return output;
+        }
+
+        // Function to run code
+        function runCode() {
+            const code = document.getElementById('codeInput').value;
+            const tokens = tokenize(code);
+            const output = interpret(tokens);
+
+            document.getElementById('output').textContent = output;
+        }
+
+        // Function to export code as a .kl or .ckl file
+        function exportCode() {
+            const code = document.getElementById('codeInput').value;
+            const fileType = document.getElementById('fileType').value;
+            const fileName = `code.${fileType}`;
+            
+            // Create a Blob with the code
+            const blob = new Blob([code], { type: 'text/plain' });
+            
+            // Create a download link and trigger the download
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = fileName;
+            link.click();
+        }
+    </script>
+</body>
+</html>
