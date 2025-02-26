@@ -1,1 +1,5 @@
-*.html
+# Purpose: Ignore files that are not needed in the repository
+# Author:  Elijah Sjogren
+*.temp
+*.tmp
+*.log
