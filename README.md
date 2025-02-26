@@ -1,10 +1,6 @@
 # KitLang
-You know what it is...
-<details>
-  <summary>i dont know what it is</summary>
-  
-if u dont, than why are you on GitHub???
-  
-</details>
+A programming language for cats
 
 [Go to Docs](docs.md)
+
+If you find this project useful, consider supporting it with a Dogecoin donation: DMfpeCcwtM1GMm1HDxQ9Ejgt5X8kryKuUE
